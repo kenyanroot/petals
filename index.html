@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jacaranda Shower</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: black;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .petal {
+            position: absolute;
+            width: calc(var(--size) * 1px);
+            height: calc(var(--size) * 1px);
+            background: linear-gradient(45deg, var(--color1), var(--color2));
+            clip-path: polygon(
+                50% 0%,    /* top center */
+                65% 15%,   /* top right curve */
+                80% 25%,   /* right upper petal */
+                85% 50%,   /* right middle */
+                70% 85%,   /* right lower */
+                50% 100%,  /* bottom center */
+                30% 85%,   /* left lower */
+                15% 50%,   /* left middle */
+                20% 25%,   /* left upper petal */
+                35% 15%    /* top left curve */
+            );
+            animation: fall linear infinite;
+            opacity: 0.85;
+            filter: drop-shadow(0 2px 4px rgba(106, 27, 154, 0.2));
+            z-index: var(--zIndex);
+        }
+
+        @keyframes fall {
+            0% {
+                transform: 
+                    translateY(var(--startY)) 
+                    translateX(calc(sin(0deg) * 50vw))
+                    rotate(0deg);
+            }
+            100% {
+                transform: 
+                    translateY(150vh) 
+                    translateX(calc(sin(720deg) * 50vw))
+                    rotate(720deg);
+            }
+        }
+
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #4a148c;
+            z-index: 2;
+            perspective: 1000px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .book {
+            position: relative;
+            width: 320px;
+            height: 440px;
+            transform-style: preserve-3d;
+            perspective: 2500px;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
+            max-width: 90vw;
+            margin: 0 auto;
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #f8f8f8 0%, #fff 5%, #fff 95%, #f8f8f8 100%);
+            padding: 2rem;
+            border-radius: 5px 15px 15px 5px;
+            border: 1px solid #eee;
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.1),
+                inset -1px 0 1px rgba(255,255,255,0.5),
+                inset -6px 0 14px rgba(0,0,0,0.1);
+            transform-origin: left center;
+            transition: transform 1.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+            cursor: pointer;
+            backface-visibility: hidden;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .page::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 100%;
+            background: linear-gradient(to right, 
+                rgba(0, 0, 0, 0.1),
+                transparent);
+            border-radius: 10px 0 0 10px;
+        }
+
+        .page.cover {
+            background: linear-gradient(45deg, #4a148c, #7c4dff);
+            color: white;
+            z-index: 5;
+            border-radius: 20px;
+            box-shadow: 
+                0 0 20px rgba(0, 0, 0, 0.5),
+                inset -20px 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .page.cover::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 100%;
+            background: linear-gradient(to right,
+                #3a1070,
+                #4a148c);
+            border-radius: 10px 0 0 10px;
+            transform: translateX(-20px) rotateY(-90deg);
+            transform-origin: right;
+        }
+
+        .page.turned {
+            transform: rotateY(-180deg);
+            box-shadow: 
+                0 0 20px rgba(0, 0, 0, 0.3),
+                inset 10px 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            position: relative;
+            font-family: 'Playfair Display', serif;
+            font-size: min(2.4em, 7vw);
+            text-shadow: 
+                2px 2px 3px rgba(0, 0, 0, 0.2);
+            color: inherit;
+            margin: 0;
+        }
+
+        p {
+            font-size: min(1.2em, 5vw);
+            color: #6a1b9a;
+            line-height: 1.4;
+            font-style: italic;
+            padding: 0 1rem;
+            margin: 0;
+            width: 100%;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 0.8em;
+            color: #9575cd;
+        }
+
+        @media (max-width: 768px) {
+            .book {
+                width: 280px;
+                height: 380px;
+            }
+
+            .page {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: min(1.8em, 6vw);
+            }
+
+            p {
+                font-size: min(1em, 4.5vw);
+                padding: 0 0.5rem;
+            }
+
+            .petal {
+                --mobile-scale: 0.6;
+                width: calc(var(--size) * var(--mobile-scale) * 1px);
+                height: calc(var(--size) * var(--mobile-scale) * 1px);
+            }
+
+            .page-number {
+                font-size: 0.7em;
+                bottom: 0.5rem;
+                right: 0.5rem;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .book {
+                /* Remove the left: 6px property */
+            }
+        }
+
+        /* Add landscape orientation fixes */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .book {
+                width: 240px;
+                height: 320px;
+            }
+
+            .content {
+                transform: translate(-50%, -40%);
+            }
+
+            .petal {
+                --mobile-scale: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <audio autoplay loop preload="auto">
+                <source src="https://www.trendyhiphop.com/wp-content/uploads/2024/03/Thee_Sacred_Souls_-_Can_I_Call_You_Rose_.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <petal 
+                v-for="(petal, index) in petals" 
+                :key="index"
+                :style="{
+                    left: petal.x + 'vw',
+                    '--color1': petal.color1,
+                    '--color2': petal.color2,
+                    '--size': petal.size,
+                    '--zIndex': petal.zIndex,
+                    'animation-duration': petal.duration + 's',
+                    'animation-delay': petal.delay + 's',
+                    '--startY': petal['--startY']
+                }"
+            ></petal>
+            <div class="content">
+                <div class="book">
+                    <div class="page cover" @click="turnPage(0)" :class="{ turned: currentPage > 0 }">
+                        <h1>Hey there beautiful 💜</h1>
+                    </div>
+                    <div class="page" :class="{ turned: currentPage > 1 }" @click="turnPage(1)" style="z-index: 4">
+                        <p>The gods must have been high when they made you 🤩</p>
+                        <span class="page-number">💞1💞</span>
+                    </div>
+                    <div class="page" :class="{ turned: currentPage > 2 }" @click="turnPage(2)" style="z-index: 3">
+                        <p>And if you are ever in trouble, I'd fight dragons to save you</p>
+                        <span class="page-number">🔥2🔥</span>
+                    </div>
+                    <div class="page" :class="{ turned: currentPage > 3 }" @click="turnPage(3)" style="z-index: 2">
+                        <p>Gravity is a myth, because you're the only thing that keeps me grounded 🌍</p>
+                        <span class="page-number">🌹3🌹</span>
+                    </div>
+                    <div class="page" :class="{ turned: currentPage > 4 }" @click="turnPage(4)" style="z-index: 1">
+                        <p>"You're the marshmallow to my hot cocoa 🍫🌺<br>The cheese to my pizza 🍕💑<br>My forever plus-one 💍💕"</p>
+                        <span class="page-number">🎆4🎆</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    petals: [],
+                    colorPairs: [
+                        ['#9b6dff', '#b794ff'],
+                        ['#7c4dff', '#9b6dff'],
+                        ['#651fff', '#7c4dff'],
+                        ['#b794ff', '#c5a3ff']
+                    ],
+                    numberOfPetals: 40,
+                    currentPage: 0,
+                    audioStarted: false
+                }
+            },
+            mounted() {
+                this.createPetals();
+                // Try autoplay first
+                const audio = document.getElementById('bgMusic');
+                audio.play().then(() => {
+                    this.audioStarted = true;
+                }).catch(() => {
+                    // Only add interaction listeners if autoplay fails
+                    document.addEventListener('mousemove', this.startAudio);
+                    document.addEventListener('touchstart', this.startAudio);
+                });
+            },
+            methods: {
+                startAudio() {
+                    if (!this.audioStarted) {
+                        const audio = document.getElementById('bgMusic');
+                        audio.play().then(() => {
+                            this.audioStarted = true;
+                            // Remove listeners after successful play
+                            document.removeEventListener('mousemove', this.startAudio);
+                            document.removeEventListener('touchstart', this.startAudio);
+                        }).catch(e => console.log('Audio play failed:', e));
+                    }
+                },
+                createPetals() {
+                    for (let i = 0; i < this.numberOfPetals; i++) {
+                        const colors = this.colorPairs[Math.floor(Math.random() * this.colorPairs.length)];
+                        const size = 25 + Math.random() * 35;  // Reduced from 35-80 to 25-60
+                        
+                        this.petals.push({
+                            x: Math.random() * 100,
+                            color1: colors[0],
+                            color2: colors[1],
+                            size: size,
+                            zIndex: Math.round(size),
+                            delay: 0,
+                            duration: 8 + Math.random() * 12,
+                            '--startY': `${-100 + Math.random() * 100}vh`
+                        });
+                    }
+                },
+                turnPage(pageNumber) {
+                    this.currentPage = pageNumber + 1;
+                    if (!this.audioStarted) {
+                        this.startAudio(); // Only try to play audio if it hasn't started yet
+                    }
+                }
+            }
+        }).component('petal', {
+            template: `<div class="petal"></div>`
+        }).mount('#app');
+    </script>
+</body>
+</html>
