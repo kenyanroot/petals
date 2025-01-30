@@ -239,7 +239,8 @@
 <body>
     <div id="app">
         <div class="container">
-            <audio autoplay loop preload="auto">
+            <iframe src="https://archive.org/download/audio-silent-wavs-one-second-half-second-quarter-second/silent_quarter-second.mp3" allow="autoplay" id="audio" style="display: none"></iframe>
+            <audio id="bgMusic" autoplay loop>
                 <source src="https://www.trendyhiphop.com/wp-content/uploads/2024/03/Thee_Sacred_Souls_-_Can_I_Call_You_Rose_.mp3" type="audio/mpeg">
                 Your browser does not support the audio element.
             </audio>
@@ -303,14 +304,11 @@
             },
             mounted() {
                 this.createPetals();
-                // Try autoplay first
+                // Simplified audio handling
                 const audio = document.getElementById('bgMusic');
-                audio.play().then(() => {
-                    this.audioStarted = true;
-                }).catch(() => {
-                    // Only add interaction listeners if autoplay fails
-                    document.addEventListener('mousemove', this.startAudio);
-                    document.addEventListener('touchstart', this.startAudio);
+                audio.play().catch(() => {
+                    // Only add click handler if autoplay fails
+                    document.addEventListener('click', this.startAudio, { once: true });
                 });
             },
             methods: {
@@ -319,9 +317,6 @@
                         const audio = document.getElementById('bgMusic');
                         audio.play().then(() => {
                             this.audioStarted = true;
-                            // Remove listeners after successful play
-                            document.removeEventListener('mousemove', this.startAudio);
-                            document.removeEventListener('touchstart', this.startAudio);
                         }).catch(e => console.log('Audio play failed:', e));
                     }
                 },
